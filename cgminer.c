@@ -3341,9 +3341,9 @@ static void __kill_work(void)
 	/* Best to get rid of it first so it doesn't
 	 * try to create any new devices */
 	if (!opt_scrypt) {
-	forcelog(LOG_DEBUG, "Killing off HotPlug thread");
-	thr = &control_thr[hotplug_thr_id];
-	kill_timeout(thr);
+		forcelog(LOG_DEBUG, "Killing off HotPlug thread");
+		thr = &control_thr[hotplug_thr_id];
+		kill_timeout(thr);
 	}
 #endif
 
@@ -3384,12 +3384,12 @@ static void __kill_work(void)
 	/* Release USB resources in case it's a restart
 	 * and not a QUIT */
 	if (!opt_scrypt) {
-	forcelog(LOG_DEBUG, "Releasing all USB devices");
-	cg_completion_timeout(&usb_cleanup, NULL, 1000);
+		forcelog(LOG_DEBUG, "Releasing all USB devices");
+		cg_completion_timeout(&usb_cleanup, NULL, 1000);
 
-	forcelog(LOG_DEBUG, "Killing off usbres thread");
-	thr = &control_thr[usbres_thr_id];
-	kill_timeout(thr);
+		forcelog(LOG_DEBUG, "Killing off usbres thread");
+		thr = &control_thr[usbres_thr_id];
+		kill_timeout(thr);
 	}
 #endif
 
