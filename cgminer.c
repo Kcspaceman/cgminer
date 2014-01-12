@@ -8573,14 +8573,14 @@ begin_bench:
 	cgtime(&total_tv_end);
 	get_datestamp(datestamp, sizeof(datestamp), &total_tv_start);
 
-	watchpool_thr_id = 2;
+	watchpool_thr_id = 3;
 	thr = &control_thr[watchpool_thr_id];
 	/* start watchpool thread */
 	if (thr_info_create(thr, NULL, watchpool_thread, NULL))
 		quit(1, "watchpool thread create failed");
 	pthread_detach(thr->pth);
 
-	watchdog_thr_id = 3;
+	watchdog_thr_id = 4;
 	thr = &control_thr[watchdog_thr_id];
 	/* start watchdog thread */
 	if (thr_info_create(thr, NULL, watchdog_thread, NULL))
@@ -8599,24 +8599,26 @@ begin_bench:
 #endif	
 
 	/* Create API socket thread */
-	api_thr_id = 5;
+	api_thr_id = 6;
 	thr = &control_thr[api_thr_id];
 	if (thr_info_create(thr, NULL, api_thread, thr))
 		quit(1, "API thread create failed");
 
 #ifdef USE_USBUTILS
-	hotplug_thr_id = 6;
-	thr = &control_thr[hotplug_thr_id];
-	if (thr_info_create(thr, NULL, hotplug_thread, thr))
-		quit(1, "hotplug thread create failed");
-	pthread_detach(thr->pth);
+	if (!opt_scrypt) {
+		hotplug_thr_id = 7;
+		thr = &control_thr[hotplug_thr_id];
+		if (thr_info_create(thr, NULL, hotplug_thread, thr))
+			quit(1, "hotplug thread create failed");
+		pthread_detach(thr->pth);
+	}
 #endif
 
 #ifdef HAVE_CURSES
 	/* Create curses input thread for keyboard input. Create this last so
 	 * that we know all threads are created since this can call kill_work
 	 * to try and shut down all previous threads. */
-	input_thr_id = 7;
+	input_thr_id = 8;
 	thr = &control_thr[input_thr_id];
 	if (thr_info_create(thr, NULL, input_thread, thr))
 		quit(1, "input thread create failed");
@@ -8624,8 +8626,8 @@ begin_bench:
 #endif
 
 	/* Just to be sure */
-	if (total_control_threads != 8)
-		quit(1, "incorrect total_control_threads (%d) should be 8", total_control_threads);
+	if (total_control_threads != 9)
+		quit(1, "incorrect total_control_threads (%d) should be 9", total_control_threads);
 
 	/* Once everything is set up, main() becomes the getwork scheduler */
 	while (42) {
