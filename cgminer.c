@@ -347,8 +347,8 @@ struct schedtime schedstart;
 struct schedtime schedstop;
 bool sched_paused;
 
-bool have_opencl;
-bool opt_scrypt;
+bool opt_opencl = 0;
+bool opt_scrypt = 0;
 #ifdef HAVE_OPENCL
 int opt_dynamic_interval = 7;
 int opt_g_threads = -1;
@@ -2393,7 +2393,7 @@ static void curses_print_status(void)
 	mvwhline(statuswin, 6, 0, '-', 80);
 	mvwhline(statuswin, statusy - 1, 0, '-', 80);
 	cg_mvwprintw(statuswin, devcursor - 1, 1, "[P]ool management %s[S]ettings [D]isplay options [Q]uit",
-		have_opencl ? "[G]PU management " : "");
+		opt_opencl ? "[G]PU management " : "");
 }
 
 static void adj_width(int var, int *length)
@@ -3887,9 +3887,11 @@ static void regen_hash(struct work *work)
 
 static void rebuild_hash(struct work *work)
 {
+#ifdef HAVE_SCRYPT
 	if (opt_scrypt)
 		scrypt_regenhash(work);
 	else
+#endif
 		regen_hash(work);
 }
 
@@ -4512,7 +4514,7 @@ void write_config(FILE *fcfg)
 	fputs("\n]\n", fcfg);
 
 #ifdef HAVE_OPENCL
-	if (nDevs) {
+	if (opt_opencl && nDevs) {
 		/* Write GPU device values */
 		fputs(",\n\"intensity\" : \"", fcfg);
 		for(i = 0; i < nDevs; i++)
@@ -5195,8 +5197,8 @@ static void *input_thread(void __maybe_unused *userdata)
 			display_pools();
 		else if (!strncasecmp(&input, "s", 1))
 			set_options();
-#if HAVE_OPENCL
-		else if (have_opencl && !strncasecmp(&input, "g", 1))
+#ifdef HAVE_OPENCL
+		else if (opt_opencl && !strncasecmp(&input, "g", 1))
 			manage_gpu();
 #endif
 		if (opt_realquiet) {
@@ -7567,7 +7569,7 @@ void print_summary(void)
 static void clean_up(bool restarting)
 {
 #ifdef HAVE_OPENCL
-	clear_adl(nDevs);
+	if (opt_opencl) clear_adl(nDevs);
 #endif
 #ifdef USE_USBUTILS
 	usb_polling = false;
@@ -7958,7 +7960,7 @@ void enable_device(struct cgpu_info *cgpu)
 #endif
 	}
 #ifdef HAVE_OPENCL
-	if (cgpu->drv->drv_id == DRIVER_opencl) {
+	if (opt_opencl && (cgpu->drv->drv_id == DRIVER_opencl)) {
 		gpu_threads += cgpu->threads;
 	}
 #endif
@@ -8274,12 +8276,6 @@ int main(int argc, char *argv[])
 
 	INIT_LIST_HEAD(&scan_devices);
 
-#ifdef HAVE_OPENCL
-	memset(gpus, 0, sizeof(gpus));
-	for (i = 0; i < MAX_GPUDEVICES; i++)
-		gpus[i].dynamic = true;
-#endif
-
 	/* parse command line */
 	opt_register_table(opt_config_table,
 			   "Options for both config file and command line");
@@ -8307,6 +8303,14 @@ int main(int argc, char *argv[])
 		pool->idle = false;
 		successful_connect = true;
 	}
+
+#ifdef HAVE_OPENCL
+	if (opt_opencl) {
+		memset(gpus, 0, sizeof(gpus));
+		for (i = 0; i < MAX_GPUDEVICES; i++)
+			gpus[i].dynamic = true;
+	}
+#endif
 
 #ifdef HAVE_CURSES
 	if (opt_realquiet || opt_display_devs)
@@ -8345,7 +8349,7 @@ int main(int argc, char *argv[])
 	if (opt_scantime < 0)
 		opt_scantime = opt_scrypt ? 30 : 60;
 
-	total_control_threads = 8;
+	total_control_threads = 9;
 	control_thr = calloc(total_control_threads, sizeof(*thr));
 	if (!control_thr)
 		quit(1, "Failed to calloc control_thr");
@@ -8562,11 +8566,13 @@ begin_bench:
 
 		cgpu->rolling = cgpu->total_mhashes = 0;
 	}
-	
+
 #ifdef HAVE_OPENCL
-	applog(LOG_INFO, "%d gpu miner threads started", gpu_threads);
-	for (i = 0; i < nDevs; i++)
-		pause_dynamic_threads(i);
+	if (opt_opencl) {
+		applog(LOG_INFO, "%d gpu miner threads started", gpu_threads);
+		for (i = 0; i < nDevs; i++)
+			pause_dynamic_threads(i);
+	}
 #endif
 
 	cgtime(&total_tv_start);
@@ -8589,13 +8595,15 @@ begin_bench:
 
 #ifdef HAVE_OPENCL
 	/* Create reinit gpu thread */
-	gpur_thr_id = 5;
-	thr = &control_thr[gpur_thr_id];
-	thr->q = tq_new();
-	if (!thr->q)
-		quit(1, "tq_new failed for gpur_thr_id");
-	if (thr_info_create(thr, NULL, reinit_gpu, thr))
-		quit(1, "reinit_gpu thread create failed");
+	if (opt_opencl) {
+		gpur_thr_id = 5;
+		thr = &control_thr[gpur_thr_id];
+		thr->q = tq_new();
+		if (!thr->q)
+			quit(1, "tq_new failed for gpur_thr_id");
+		if (thr_info_create(thr, NULL, reinit_gpu, thr))
+			quit(1, "reinit_gpu thread create failed");
+	}
 #endif	
 
 	/* Create API socket thread */
