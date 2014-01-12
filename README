@@ -1,15 +1,20 @@
 This is a multi-threaded multi-pool FPGA and ASIC miner for bitcoin.
 This also supports GPU mining with ATI GPU monitoring, (over)clocking
 and fanspeed support for bitcoin and derivative coins. Do not use on
-multiple block chains at the same time!
-
+multiple block chains at the same time. In particular, using scrypt
+with any other mining is not recommended!
 
 This code is provided entirely free of charge by the programmer in his spare
 time so donations would be greatly appreciated. Please consider donating to the
 address below.
 
-Con Kolivas <kernel@kolivas.org>
-15qSxP1SQcUX3o4nhkfdbgyoWEFMomJ4rZ
+ORIG:
+   Con Kolivas <kernel@kolivas.org>
+   15qSxP1SQcUX3o4nhkfdbgyoWEFMomJ4rZ
+
+FORK:
+   Jim Jagielski <jimjag@gmail.com>
+   18X3CqCNSJsVzQEZFjWxeGNkmTqz6DHy1h
 
 DOWNLOADS:
 
