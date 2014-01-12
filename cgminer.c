@@ -123,7 +123,7 @@ static const bool opt_time = true;
 unsigned long long global_hashrate;
 unsigned long global_quota_gcd = 1;
 
-#if defined(USE_USBUTILS)
+#if defined(USE_USBUTILS) || defined(HAVE_OPENCL)
 int nDevs;
 #endif
 bool opt_restart = true;
