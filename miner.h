@@ -335,6 +335,15 @@ struct gpu_adl {
 };
 #endif
 
+enum cl_kernels {
+	KL_NONE,
+	KL_POCLBM,
+	KL_PHATK,
+	KL_DIAKGCN,
+	KL_DIABLO,
+	KL_SCRYPT,
+};
+
 extern void blank_get_statline_before(char *buf, size_t bufsiz, struct cgpu_info __maybe_unused *cgpu);
 
 struct api_data;
@@ -400,15 +409,6 @@ enum dev_enable {
 	DEV_ENABLED,
 	DEV_DISABLED,
 	DEV_RECOVER,
-};
-
-enum cl_kernels {
-	KL_NONE,
-	KL_POCLBM,
-	KL_PHATK,
-	KL_DIAKGCN,
-	KL_DIABLO,
-	KL_SCRYPT,
 };
 
 enum dev_reason {
@@ -1040,7 +1040,6 @@ extern bool opt_api_listen;
 extern bool opt_api_network;
 extern bool opt_delaynet;
 extern bool opt_restart;
-extern bool opt_nogpu;
 extern char *opt_icarus_options;
 extern char *opt_icarus_timing;
 extern char *opt_bmsc_options;
@@ -1120,6 +1119,8 @@ extern void kill_work(void);
 
 extern void reinit_device(struct cgpu_info *cgpu);
 
+extern bool opt_nogpu;
+
 #ifdef HAVE_ADL
 extern bool gpu_stats(int gpu, float *temp, int *engineclock, int *memclock, float *vddc, int *activity, int *fanspeed, int *fanpercent, int *powertune);
 extern int set_fanspeed(int gpu, int iFanSpeed);
@@ -1139,8 +1140,9 @@ extern void adjust_quota_gcd(void);
 extern struct pool *add_pool(void);
 extern bool add_pool_details(struct pool *pool, bool live, char *url, char *user, char *pass);
 
-#define MAX_GPUDEVICES 16
 #define MAX_DEVICES 4096
+
+#define MAX_GPUDEVICES 16
 
 #define MIN_SHA_INTENSITY -10
 #define MIN_SHA_INTENSITY_STR "-10"
@@ -1174,9 +1176,6 @@ extern bool use_syslog;
 extern bool opt_quiet;
 extern struct thr_info *control_thr;
 extern struct thr_info **mining_thr;
-extern struct cgpu_info gpus[MAX_GPUDEVICES];
-extern int gpu_threads;
-extern bool opt_scrypt;
 extern double total_secs;
 extern int mining_threads;
 extern int total_devices;
@@ -1204,6 +1203,10 @@ extern double current_diff;
 extern uint64_t best_diff;
 extern struct timeval block_timeval;
 extern char *workpadding;
+
+extern struct cgpu_info gpus[MAX_GPUDEVICES];
+extern int gpu_threads;
+extern bool opt_scrypt;
 
 #ifdef HAVE_OPENCL
 typedef struct {
