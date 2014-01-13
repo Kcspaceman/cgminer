@@ -581,9 +581,9 @@ echo "  curses.TUI...........: $cursesmsg"
 echo
 if test "x$opencl" == xyes; then
 	if test $found_opencl = 1; then
-		echo "  OpenCL...............: Enabled - not really"
+		echo "  OpenCL...............: Enabled"
 		if test "x$scrypt" != xno; then
-			echo "  scrypt...............: Enabled - not really"
+			echo "  scrypt...............: Enabled"
 		else
 			echo "  scrypt...............: Disabled"
 		fi
