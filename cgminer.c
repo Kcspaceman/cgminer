@@ -3341,9 +3341,9 @@ static void __kill_work(void)
 	/* Best to get rid of it first so it doesn't
 	 * try to create any new devices */
 	if (!opt_scrypt) {
-		forcelog(LOG_DEBUG, "Killing off HotPlug thread");
-		thr = &control_thr[hotplug_thr_id];
-		kill_timeout(thr);
+	forcelog(LOG_DEBUG, "Killing off HotPlug thread");
+	thr = &control_thr[hotplug_thr_id];
+	kill_timeout(thr);
 	}
 #endif
 
@@ -3384,12 +3384,12 @@ static void __kill_work(void)
 	/* Release USB resources in case it's a restart
 	 * and not a QUIT */
 	if (!opt_scrypt) {
-		forcelog(LOG_DEBUG, "Releasing all USB devices");
-		cg_completion_timeout(&usb_cleanup, NULL, 1000);
+	forcelog(LOG_DEBUG, "Releasing all USB devices");
+	cg_completion_timeout(&usb_cleanup, NULL, 1000);
 
-		forcelog(LOG_DEBUG, "Killing off usbres thread");
-		thr = &control_thr[usbres_thr_id];
-		kill_timeout(thr);
+	forcelog(LOG_DEBUG, "Killing off usbres thread");
+	thr = &control_thr[usbres_thr_id];
+	kill_timeout(thr);
 	}
 #endif
 
@@ -7412,7 +7412,7 @@ static void *watchdog_thread(void __maybe_unused *userdata)
 					temp, fanpercent, fanspeed, engineclock, memclock, vddc, activity, powertune);
 			}
 #endif
-			
+
 			/* Thread is waiting on getwork or disabled */
 			if (thr->getwork || *denable == DEV_DISABLED)
 				continue;
@@ -8600,7 +8600,7 @@ begin_bench:
 		if (thr_info_create(thr, NULL, reinit_gpu, thr))
 			quit(1, "reinit_gpu thread create failed");
 	}
-#endif	
+#endif
 
 	/* Create API socket thread */
 	api_thr_id = 6;
@@ -8610,11 +8610,11 @@ begin_bench:
 
 #ifdef USE_USBUTILS
 	if (!opt_scrypt) {
-		hotplug_thr_id = 7;
-		thr = &control_thr[hotplug_thr_id];
-		if (thr_info_create(thr, NULL, hotplug_thread, thr))
-			quit(1, "hotplug thread create failed");
-		pthread_detach(thr->pth);
+	hotplug_thr_id = 7;
+	thr = &control_thr[hotplug_thr_id];
+	if (thr_info_create(thr, NULL, hotplug_thread, thr))
+		quit(1, "hotplug thread create failed");
+	pthread_detach(thr->pth);
 	}
 #endif
 
