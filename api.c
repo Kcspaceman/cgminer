@@ -510,28 +510,23 @@ struct CODES {
 #endif
  },
 
-#ifdef HAVE_OPENCL
- { SEVERITY_ERR,   MSG_NODEVS,	PARAM_NONE,	"No GPUs"
-#ifdef HAVE_AN_ASIC
-						"/ASCs"
-#endif
-#ifdef HAVE_AN_FPGA
-						"/PGAs"
-#endif
- },
-#else /* HAVE_OPENCL */
 { SEVERITY_ERR,   MSG_NODEVS, PARAM_NONE,     "No "
+#ifdef HAVE_OPENCL
+                                               "GPUs"
+#endif
+#if defined(HAVE_AN_ASIC) && defined(HAVE_OPENCL)
+                                               "/"
+#endif
 #ifdef HAVE_AN_ASIC
                                                "ASCs"
 #endif
-#if defined(HAVE_AN_ASIC) && defined(HAVE_AN_FPGA)
+#if defined(HAVE_AN_FPGA) && (defined(HAVE_OPENCL) || defined(HAVE_AN_ASIC))
                                                "/"
 #endif
 #ifdef HAVE_AN_FPGA
                                                "PGAs"
 #endif
  },
-#endif /* HAVE_OPENCL */
 
  { SEVERITY_SUCC,  MSG_SUMM,	PARAM_NONE,	"Summary" },
 #ifdef HAVE_OPENCL
